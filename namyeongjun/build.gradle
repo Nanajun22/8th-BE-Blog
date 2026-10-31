@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.11'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.epages.restdocs-api-spec' version '0.19.4'   // 추가
 }
 
 group = 'org.example'
@@ -32,8 +33,36 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.19.4'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+
+
+// 추가: openapi3 명세 생성 설정
+openapi3 {
+    servers = [ { url = 'http://localhost:8080' } ]
+    title = '8th-BE API'
+    description = '8th-BE API 명세'
+    version = '0.0.1'
+    format = 'yaml'
+    outputDirectory = 'build/resources/main/static/docs'
+}
+
+tasks.matching { it.name == 'openapi3' }.configureEach {
+    dependsOn 'test'
+    doFirst {
+        file('build/resources/main/static/docs').mkdirs()
+    }
+    doLast {
+        def f = file('build/resources/main/static/docs/openapi3.yaml')
+        def text = f.getText('UTF-8')
+        text = text.replaceAll(/(?m)^(\s+)("?)([A-Za-z0-9_\-]+)__[^":\r\n]*\2:\s*$/, '$1$2$3$2:')
+        f.setText(text, 'UTF-8')
+    }
 }
