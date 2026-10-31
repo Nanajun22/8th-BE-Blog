@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/posts")
-public class PostController {
+public class PostController  {
     private final PostService postService;
 
     // 조회
@@ -32,7 +32,7 @@ public class PostController {
     public ResponseEntity<ApiResponse<PostCreateResponse>> createPost(@RequestBody @Valid PostCreateRequest request,
                                                                       Long memberId
     ) {
-        return ApiResponse.success(SuccessCode.COMMON_OK,postService.createPost(request,memberId));
+        return ApiResponse.success(SuccessCode.COMMON_CREATED,postService.createPost(request,memberId));
     }
 
     // 수정
